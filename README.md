@@ -2,7 +2,7 @@
 
 Detection engineering project mapping five MITRE ATT&CK cloud techniques to working detection rules across two SIEM platforms, built against simulated AWS CloudTrail telemetry.
 
-**Author:** Mukesh Kumar — Senior Cloud Security & Operations Engineer
+**Author:** Mukesh Kumar — Cloud Security Engineer
 **Stack:** Splunk Enterprise (SPL) · Microsoft Sentinel (KQL) · Python · AWS CloudTrail schema
 **Status:** Complete — all 5 detections verified executing on both platforms; one rule deployed as a live, scheduled Sentinel Analytics Rule with native MITRE ATT&CK tagging
 **Repo:** [`MukeshKumarCloud/MITRE-Cloud-SIEM-Detections`](https://github.com/MukeshKumarCloud/MITRE-Cloud-SIEM-Detections)
