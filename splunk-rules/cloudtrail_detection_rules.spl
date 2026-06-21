@@ -1,0 +1,358 @@
+# =============================================================================
+# Splunk Enterprise Security — Detection Rules
+# MITRE ATT&CK Cloud TTP Mapping
+# Platform: Splunk Free / Enterprise (SPL — Splunk Processing Language)
+# Log Source: AWS CloudTrail (NDJSON ingested via Splunk monitor/oneshot)
+# Index: cloudtrail_lab
+# Author: Mukesh Kumar | github.com/MukeshKumarCloud
+# =============================================================================
+#
+# HOW TO USE THIS FILE:
+# Each rule below is a complete SPL search query.
+# In Splunk Web UI: go to Search & Reporting → paste the query → Run.
+# During the 60-day Enterprise trial you can also save these as Saved Searches
+# with scheduled alerts. On Free license, run them manually.
+#
+# FIELD REFERENCE (how our log fields map to SPL):
+#   eventName           = the AWS API call name (e.g., ConsoleLogin, GetObject)
+#   sourceIPAddress     = IP that made the API call
+#   userIdentity.userName = IAM username (Splunk auto-parses nested JSON)
+#   awsRegion           = AWS region where the call was made
+#   eventSource         = AWS service (s3.amazonaws.com, iam.amazonaws.com, etc.)
+#   mitreAttackTechnique = custom field we added in our log generator
+#   eventTime           = timestamp of the API call
+#   responseElements.ConsoleLogin = "Success" or "Failure"
+#   additionalEventData.MFAUsed = "Yes" or "No"
+#   requestParameters.bucketName = S3 bucket targeted
+#   requestParameters.policyArn = IAM policy ARN being attached
+# =============================================================================
+
+
+# =============================================================================
+# RULE 1 — T1078: Valid Accounts (Impossible Travel / Credential Abuse)
+# Tactic: Initial Access
+# Severity: CRITICAL
+#
+# What this detects:
+#   The same IAM user authenticates successfully from TWO DIFFERENT source IPs
+#   within a 30-minute window. If the IPs are geographically distant, this is
+#   "impossible travel" — a near-certain indicator of credential compromise.
+#   We also flag when MFA is absent on the second login (attacker session).
+#
+# Why it matters:
+#   T1078 is the #1 cloud initial access technique. Credential stuffing, phishing,
+#   and infostealer malware all result in valid accounts being used by attackers.
+#   The "impossible travel" pattern catches this even when the password is correct.
+#
+# Data flow:
+#   CloudTrail ConsoleLogin event → Splunk index →
+#   stats count distinct IPs per user per 30min → alert if count > 1
+# =============================================================================
+
+source="sample_cloudtrail_logs.json" host="fedora" index="cloudtrail_logs" sourcetype="_json" eventName=ConsoleLogin
+    "responseElements.ConsoleLogin"=Success
+| sort 0 "userIdentity.userName" _time
+| streamstats current=t window=2
+    values(sourceIPAddress) AS recent_ips
+    values(_time) AS recent_times
+    values("additionalEventData.MFAUsed") AS mfa_status
+    values(awsRegion) AS regions_used
+    BY "userIdentity.userName"
+| eval distinct_ips_in_pair=mvcount(mvdedup(recent_ips))
+| eval time_gap_seconds=if(mvcount(recent_times)=2, tonumber(mvindex(recent_times,1))-tonumber(mvindex(recent_times,0)), 0)
+| where distinct_ips_in_pair > 1 AND time_gap_seconds <= 1800
+| eval alert_severity=case(
+    match(mfa_status, "No"), "CRITICAL",
+    1=1, "MEDIUM"
+  )
+| eval mitre_technique="T1078 - Valid Accounts"
+| eval mitre_tactic="Initial Access"
+| eval detection_name="Impossible Travel - Same User Multiple Source IPs"
+| table
+    "userIdentity.userName"
+    _time
+    recent_ips
+    time_gap_seconds
+    regions_used
+    mfa_status
+    alert_severity
+    mitre_technique
+    mitre_tactic
+    detection_name
+| sort - _time
+
+# =============================================================================
+# RULE 2 — T1530: Data from Cloud Storage Object (Mass S3 Exfiltration)
+# Tactic: Collection
+# Severity: HIGH
+#
+# What this detects:
+#   A single user or IP performs more than 20 S3 GetObject calls within
+#   a 10-minute window — a pattern consistent with automated bulk data
+#   exfiltration tools (aws s3 sync, boto3 scripts, Pacu, etc.).
+#   We further flag if the keys match sensitive path patterns.
+#
+# Why it matters:
+#   Normal user behavior: a few GetObject calls per session.
+#   Attacker behavior: hundreds of GetObject calls in minutes.
+#   Threshold of 20/10min has low false-positive rate for most orgs.
+#   Adjust the threshold (20) based on your environment's baseline.
+#
+# Sensitive path patterns flagged:
+#   finance/, hr/, secrets/, customers/, engineering/
+# =============================================================================
+
+source="sample_cloudtrail_logs.json" host="fedora" index="cloudtrail_logs" sourcetype="_json" eventName=GetObject
+    eventSource=s3.amazonaws.com
+| eval access_time=strptime(eventTime, "%Y-%m-%dT%H:%M:%SZ")
+| bin access_time span=10m
+| eval s3_key='requestParameters.key'
+| eval is_sensitive=if(
+    match(s3_key, "^(finance|hr|secrets|customers|engineering)/"),
+    1, 0
+  )
+| stats
+    count AS getobject_count
+    dc(s3_key) AS distinct_keys_accessed
+    sum(is_sensitive) AS sensitive_key_hits
+    values(s3_key) AS keys_list
+    values(sourceIPAddress) AS source_ips
+    BY "userIdentity.userName" "requestParameters.bucketName" access_time
+| where getobject_count > 20
+| eval alert_severity=case(
+    sensitive_key_hits > 5, "CRITICAL",
+    getobject_count > 50, "HIGH",
+    1=1, "MEDIUM"
+  )
+| eval mitre_technique="T1530 - Data from Cloud Storage"
+| eval mitre_tactic="Collection"
+| eval detection_name="Mass S3 GetObject - Bulk Data Access Detected"
+| table
+    "userIdentity.userName"
+    "requestParameters.bucketName"
+    access_time
+    getobject_count
+    distinct_keys_accessed
+    sensitive_key_hits
+    source_ips
+    alert_severity
+    mitre_technique
+    mitre_tactic
+    detection_name
+| sort - getobject_count
+
+# =============================================================================
+# RULE 3 — T1537: Transfer Data to Cloud Account (Cross-Account Exfiltration)
+# Tactic: Exfiltration
+# Severity: CRITICAL
+#
+# What this detects:
+#   Two-stage detection:
+#   Stage 1 — PutBucketPolicy granting access to an external/unknown AWS account ID.
+#             Any bucket policy that adds a Principal from outside your account list
+#             is immediately suspicious and should trigger an alert.
+#   Stage 2 — CopyObject where the destination bucket belongs to a different
+#             account than the source. This is the actual data movement event.
+#
+# Why it matters:
+#   Once data lands in an attacker-controlled AWS account, it's gone.
+#   There's no recall. This detection must fire BEFORE or DURING the copy,
+#   which is why Stage 1 (policy modification) is equally important.
+#
+# Known legitimate account IDs should be added to the allowlist below.
+# =============================================================================
+
+# Stage 1: Detect cross-account bucket policy modification
+source="sample_cloudtrail_logs.json" host="fedora" index="cloudtrail_logs" sourcetype="_json" eventName=PutBucketPolicy
+    eventSource=s3.amazonaws.com
+| eval bucket_policy='requestParameters.policy'
+| eval policy_json=json_extract(bucket_policy, "Statement{}.Principal.AWS")
+| eval contains_external_account=if(NOT match(policy_json, "123456789012"), 1, 0)
+| where contains_external_account=1
+| eval alert_severity="CRITICAL"
+| eval mitre_technique="T1537 - Transfer Data to Cloud Account"
+| eval mitre_tactic="Exfiltration"
+| eval detection_name="Cross-Account Bucket Policy - External Principal Added"
+| table
+    eventTime
+    "userIdentity.userName"
+    "requestParameters.bucketName"
+    sourceIPAddress
+    bucket_policy
+    alert_severity
+    mitre_technique
+    mitre_tactic
+    detection_name
+| append [
+    search source="sample_cloudtrail_logs.json" host="fedora" index="cloudtrail_logs" sourcetype="_json"
+        eventName=CopyObject
+        eventSource=s3.amazonaws.com
+    | where isnotnull(externalAccountId)
+    | where externalAccountId != "123456789012"
+    | eval alert_severity="CRITICAL"
+    | eval mitre_technique="T1537 - Transfer Data to Cloud Account"
+    | eval mitre_tactic="Exfiltration"
+    | eval detection_name="CopyObject to External AWS Account - Active Exfiltration"
+    | table
+        eventTime
+        "userIdentity.userName"
+        "requestParameters.destinationBucket"
+        externalAccountId
+        sourceIPAddress
+        alert_severity
+        mitre_technique
+        mitre_tactic
+        detection_name
+]
+| sort - eventTime
+
+
+# =============================================================================
+# RULE 4 — T1580: Cloud Infrastructure Discovery (API Enumeration / Recon)
+# Tactic: Discovery
+# Severity: HIGH
+#
+# What this detects:
+#   A single source IP or user makes 15+ distinct List*/Describe*/Get* API calls
+#   across MULTIPLE AWS services within a 5-minute window.
+#   This is the signature of automated cloud enumeration tools:
+#   Pacu, enumerate-iam, ScoutSuite, CloudMapper, Prowler (when used offensively).
+#
+# Why it matters:
+#   Recon always precedes exploitation. An attacker who just got valid credentials
+#   (T1078) will immediately enumerate what they have access to.
+#   Catching the recon phase prevents the subsequent attack phases.
+#
+# Detection logic:
+#   - Filter only read-only/discovery API calls (List*, Describe*, Get*)
+#   - Count distinct services touched (cross-service recon is more suspicious)
+#   - Alert when rate exceeds threshold within the time window
+# =============================================================================
+
+source="sample_cloudtrail_logs.json" host="fedora" index="cloudtrail_logs" sourcetype="_json" | where match(eventName, "^(List|Describe|Get)")
+| eval enum_time=strptime(eventTime, "%Y-%m-%dT%H:%M:%SZ")
+| bin enum_time span=5m
+| stats
+    count AS api_call_count
+    dc(eventName) AS distinct_api_calls
+    dc(eventSource) AS distinct_services_touched
+    values(eventName) AS api_calls_made
+    values(eventSource) AS services_enumerated
+    BY sourceIPAddress "userIdentity.userName" enum_time
+| where api_call_count >= 15
+      AND distinct_services_touched >= 3
+| eval alert_severity=case(
+    distinct_services_touched >= 5, "CRITICAL",
+    api_call_count >= 30, "HIGH",
+    1=1, "MEDIUM"
+  )
+| eval mitre_technique="T1580 - Cloud Infrastructure Discovery"
+| eval mitre_tactic="Discovery"
+| eval detection_name="API Enumeration Burst - Multi-Service Recon Detected"
+| table
+    "userIdentity.userName"
+    sourceIPAddress
+    enum_time
+    api_call_count
+    distinct_api_calls
+    distinct_services_touched
+    services_enumerated
+    alert_severity
+    mitre_technique
+    mitre_tactic
+    detection_name
+| sort - api_call_count
+
+
+# =============================================================================
+# RULE 5 — T1136: Create Account (Rogue IAM User Creation)
+# Tactic: Persistence
+# Severity: CRITICAL
+#
+# What this detects:
+#   The combination of CreateUser + AttachUserPolicy (AdministratorAccess) +
+#   CreateAccessKey occurring for the same new userName within a 5-minute window.
+#   This three-event cluster is the exact pattern of an attacker creating a
+#   backdoor admin account for persistent access.
+#
+# Why it matters:
+#   Even if the original compromised credential (T1078) is revoked, the backdoor
+#   account survives. This is how attackers maintain persistence after detection.
+#   Each individual event could be legitimate. The COMBINATION in rapid succession
+#   from an unusual IP is what makes it malicious.
+#
+# High-value enhancement:
+#   Add a lookup table of known corporate IAM naming conventions.
+#   Flag any CreateUser where userName doesn't match the pattern.
+# =============================================================================
+
+source="sample_cloudtrail_logs.json" host="fedora" index="cloudtrail_logs" sourcetype="_json" eventSource=iam.amazonaws.com
+    (eventName=CreateUser OR eventName=AttachUserPolicy OR eventName=CreateAccessKey)
+| eval event_time=strptime(eventTime, "%Y-%m-%dT%H:%M:%SZ")
+| eval target_user=coalesce(
+    'requestParameters.userName',
+    'responseElements.user.userName',
+    'responseElements.accessKey.userName'
+  )
+| eval is_admin_policy=if(
+    match('requestParameters.policyArn', "AdministratorAccess"),
+    1, 0
+  )
+| bin event_time span=5m
+| stats
+    dc(eventName) AS distinct_event_types
+    values(eventName) AS events_seen
+    sum(is_admin_policy) AS admin_policy_attached
+    values(sourceIPAddress) AS source_ips
+    values("userIdentity.userName") AS actor
+    BY target_user event_time
+| where distinct_event_types >= 2
+      AND admin_policy_attached >= 1
+| eval alert_severity=case(
+    distinct_event_types >= 3 AND admin_policy_attached >= 1, "CRITICAL",
+    admin_policy_attached >= 1, "HIGH",
+    1=1, "MEDIUM"
+  )
+| eval mitre_technique="T1136 - Create Account"
+| eval mitre_tactic="Persistence"
+| eval detection_name="Rogue IAM User - Create + AdminAccess + AccessKey Cluster"
+| table
+    target_user
+    event_time
+    actor
+    distinct_event_types
+    events_seen
+    admin_policy_attached
+    source_ips
+    alert_severity
+    mitre_technique
+    mitre_tactic
+    detection_name
+| sort - alert_severity
+
+
+# =============================================================================
+# BONUS: UNIFIED THREAT TIMELINE
+# Run this to get a chronological view of ALL TTP events across the attack chain.
+# Use this for the "attack story" section of your GitHub README.
+# This is what an incident responder would run to reconstruct the attack timeline.
+# =============================================================================
+
+source="sample_cloudtrail_logs.json" host="fedora" index="cloudtrail_logs" sourcetype="_json" | where isnotnull(mitreAttackTechnique) AND mitreAttackTechnique!=""
+| eval event_time_epoch=strptime(eventTime, "%Y-%m-%dT%H:%M:%SZ")
+| sort event_time_epoch
+| table
+    eventTime
+    "userIdentity.userName"
+    sourceIPAddress
+    awsRegion
+    eventName
+    eventSource
+    mitreAttackTechnique
+    mitreAttackTactic
+| rename
+    "userIdentity.userName" AS actor
+    eventName AS api_call
+    eventSource AS aws_service
+    mitreAttackTechnique AS ttp
+    mitreAttackTactic AS tactic

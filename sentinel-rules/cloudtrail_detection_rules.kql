@@ -1,0 +1,358 @@
+// =============================================================================
+// Microsoft Sentinel — Detection Rules (Analytics Rules)
+// MITRE ATT&CK Cloud TTP Mapping
+// Platform: Microsoft Sentinel (KQL — Kusto Query Language)
+// Log Source: AWS CloudTrail ingested as custom DCR-based table: CloudTrailLab_CL
+// Author: Mukesh Kumar | github.com/MukeshKumarCloud
+// =============================================================================
+//
+// HOW TO USE THIS FILE:
+// Each rule below is a complete KQL query.
+// In Sentinel: Logs blade → paste query → Run.
+// To make it a live Analytics Rule: Analytics → + Create → Scheduled query rule
+// → paste the query → set MITRE mapping in the rule wizard (Sentinel has
+// native MITRE ATT&CK tagging built into the rule creation UI — pick the
+// technique from a dropdown, no manual tagging needed).
+//
+// ─────────────────────────────────────────────────────────────────────────
+// IMPORTANT SCHEMA NOTE — READ THIS BEFORE YOU TOUCH THE QUERIES BELOW:
+// ─────────────────────────────────────────────────────────────────────────
+// Modern Sentinel custom log ingestion (DCR-based custom tables, what you'll
+// build in this lab) does NOT auto-flatten nested JSON into fields like
+// "userIdentity_userName_s" the way the OLD legacy "Custom Fields" mechanism
+// used to. That _s/_t suffix convention belongs to the deprecated
+// Log Analytics Custom Fields (MMA agent era) — don't memorize that for an
+// interview, it'll flag you as out of date.
+//
+// In a DCR-based custom table, your raw JSON typically lands in a single
+// dynamic-typed column (commonly named RawData or similar, depending on how
+// you define your DCR transform). You then parse it at QUERY TIME using
+// parse_json(), or you flatten it ONCE at INGEST TIME inside the DCR's
+// transformKql so the table has clean top-level columns from the start.
+//
+// This lab uses the ingest-time flattening approach (cleaner, cheaper at
+// query time, and what most production Sentinel deployments do). The DCR
+// transform query (you'll write this in Phase 4 of the README) projects
+// the nested CloudTrail JSON into flat columns BEFORE it lands in the table.
+// That's why the columns below look flat (EventName, SourceIPAddress, etc.)
+// instead of having _s/_t suffixes.
+//
+// Table name: CloudTrailLab_CL (the _CL suffix is automatic and IS still
+// current — Microsoft Learn confirms all custom tables get _CL appended
+// regardless of ingestion method.)
+// ─────────────────────────────────────────────────────────────────────────
+//
+// FIELD REFERENCE (flat column names after DCR transform):
+//   EventName             = the AWS API call name (e.g., ConsoleLogin, GetObject)
+//   SourceIPAddress       = source IP
+//   UserName              = IAM username (flattened from userIdentity.userName)
+//   AwsRegion              = AWS region
+//   EventSource            = AWS service
+//   MitreTechnique         = custom field from our log generator
+//   EventTime              = actual event timestamp (datetime type)
+//   ConsoleLoginResult     = flattened from responseElements.ConsoleLogin
+//   MFAUsed                 = flattened from additionalEventData.MFAUsed
+//   S3BucketName            = flattened from requestParameters.bucketName
+//   S3Key                   = flattened from requestParameters.key
+//   PolicyArn               = flattened from requestParameters.policyArn
+// =============================================================================
+
+
+// =============================================================================
+// RULE 1 — T1078: Valid Accounts (Impossible Travel / Credential Abuse)
+// Tactic: Initial Access
+// Severity: High
+//
+// What this detects:
+//   Same IAM user, successful ConsoleLogin events from 2+ distinct source IPs
+//   within a 30-minute window. Flags MFA-absent sessions as higher severity.
+//
+// Sentinel-native equivalent: conceptually similar to Microsoft's built-in
+// "Impossible travel activity" analytics rule template, rebuilt here for
+// AWS CloudTrail data instead of Entra ID sign-in logs.
+// =============================================================================
+
+// NOTE ON DESIGN: this rule originally used `bin(EventTime, 30m)`, which has
+// a known flaw — fixed clock-aligned windows can split a real attack pattern
+// across two bins if the anomalous event lands near a boundary (e.g. a login
+// at 08:33 falls into a DIFFERENT 30-min bin than logins at 08:00-08:20, even
+// though they're well within a real 30-minute lookback of each other). This
+// was caught during lab testing against the generated dataset in this repo.
+//
+// First fix attempt used row_window_session with UserName as the 4th
+// (Restart) argument — WRONG, confirmed against Microsoft Learn docs
+// (learn.microsoft.com/en-us/kusto/query/row-window-session-function):
+// the 4th parameter must be a BOOLEAN expression (e.g. `X != prev(X)`),
+// not a bare column. That alone would have failed to compile.
+//
+// Second consideration, also caught before shipping: even with the syntax
+// fixed, `MaxDistanceFromFirst` resets a session once a row is further than
+// that distance from the FIRST event in the session — not from the previous
+// event. In this lab's data, the attacker login at 08:33 is 33 minutes from
+// the first legit login at 08:00 (exceeds a 30m MaxDistanceFromFirst) but
+// only 13 minutes from the immediately preceding login at 08:20. Using 30m
+// for both parameters would silently reproduce the same boundary-splitting
+// bug this rewrite was meant to fix.
+//
+// Final fix: set MaxDistanceFromFirst generously high (4h) so it's not the
+// binding constraint for a single workday's login activity, and rely on
+// MaxDistanceBetweenNeighbors=30m (gap to the PREVIOUS login) as the actual
+// detection threshold — this matches "is this login within 30 minutes of
+// this user's last login from a different IP," which is the real intent.
+CloudTrailLab_CL
+| where EventName == "ConsoleLogin"
+| where ConsoleLoginResult == "Success"
+| sort by UserName asc, EventTime asc
+| extend SessionStart = row_window_session(EventTime, 4h, 30m, UserName != prev(UserName))
+| summarize
+    DistinctIPs = dcount(SourceIPAddress),
+    IPList = make_set(SourceIPAddress),
+    RegionsUsed = make_set(AwsRegion),
+    MFAStatusList = make_set(MFAUsed),
+    LoginCount = count(),
+    WindowStart = min(EventTime),
+    WindowEnd = max(EventTime)
+    by UserName, SessionStart
+| where DistinctIPs > 1
+| extend AlertSeverity = case(
+    MFAStatusList has "No", "Critical",
+    DistinctIPs > 3, "High",
+    "Medium"
+  )
+| extend
+    MitreTechnique = "T1078 - Valid Accounts",
+    MitreTactic = "InitialAccess",
+    DetectionName = "Impossible Travel - Same User Multiple Source IPs"
+| project
+    UserName,
+    WindowStart,
+    WindowEnd,
+    DistinctIPs,
+    IPList,
+    RegionsUsed,
+    MFAStatusList,
+    LoginCount,
+    AlertSeverity,
+    MitreTechnique,
+    MitreTactic,
+    DetectionName
+| sort by DistinctIPs desc
+
+
+// =============================================================================
+// RULE 2 — T1530: Data from Cloud Storage Object (Mass S3 Exfiltration)
+// Tactic: Collection
+// Severity: High
+//
+// What this detects:
+//   A single user performs 20+ S3 GetObject calls within a 10-minute window.
+//   Flags higher severity when sensitive path patterns are matched.
+// =============================================================================
+
+CloudTrailLab_CL
+| where EventName == "GetObject"
+| where EventSource == "s3.amazonaws.com"
+| extend IsSensitive = iff(
+    S3Key matches regex @"^(finance|hr|secrets|customers|engineering)/",
+    1, 0
+  )
+| summarize
+    GetObjectCount = count(),
+    DistinctKeysAccessed = dcount(S3Key),
+    SensitiveKeyHits = sum(IsSensitive),
+    KeysList = make_set(S3Key),
+    SourceIPs = make_set(SourceIPAddress)
+    by UserName, S3BucketName, bin(EventTime, 10m)
+| where GetObjectCount > 20
+| extend AlertSeverity = case(
+    SensitiveKeyHits > 5, "Critical",
+    GetObjectCount > 50, "High",
+    "Medium"
+  )
+| extend
+    MitreTechnique = "T1530 - Data from Cloud Storage",
+    MitreTactic = "Collection",
+    DetectionName = "Mass S3 GetObject - Bulk Data Access Detected"
+| project
+    UserName,
+    S3BucketName,
+    EventTime,
+    GetObjectCount,
+    DistinctKeysAccessed,
+    SensitiveKeyHits,
+    SourceIPs,
+    AlertSeverity,
+    MitreTechnique,
+    MitreTactic,
+    DetectionName
+| sort by GetObjectCount desc
+
+
+// =============================================================================
+// RULE 3 — T1537: Transfer Data to Cloud Account (Cross-Account Exfiltration)
+// Tactic: Exfiltration
+// Severity: Critical
+//
+// What this detects (two unioned queries):
+//   1. PutBucketPolicy events that grant access to an AWS account ID outside
+//      your own (external Principal in the bucket policy document)
+//   2. CopyObject events where the source account differs from your account ID
+//
+// IMPORTANT: replace "123456789012" with YOUR actual AWS account ID
+// =============================================================================
+
+let MyAccountId = "123456789012";
+let PolicyChanges =
+    CloudTrailLab_CL
+    | where EventName == "PutBucketPolicy"
+    | where EventSource == "s3.amazonaws.com"
+    | where BucketPolicyDocument !contains MyAccountId
+    | extend
+        AlertSeverity = "Critical",
+        MitreTechnique = "T1537 - Transfer Data to Cloud Account",
+        MitreTactic = "Exfiltration",
+        DetectionName = "Cross-Account Bucket Policy - External Principal Added"
+    | project
+        EventTime,
+        UserName,
+        S3BucketName,
+        SourceIPAddress,
+        BucketPolicyDocument,
+        AlertSeverity,
+        MitreTechnique,
+        MitreTactic,
+        DetectionName;
+let CrossAccountCopies =
+    CloudTrailLab_CL
+    | where EventName == "CopyObject"
+    | where EventSource == "s3.amazonaws.com"
+    | where isnotempty(ExternalAccountId)
+    | where ExternalAccountId != MyAccountId
+    | extend
+        AlertSeverity = "Critical",
+        MitreTechnique = "T1537 - Transfer Data to Cloud Account",
+        MitreTactic = "Exfiltration",
+        DetectionName = "CopyObject to External AWS Account - Active Exfiltration"
+    | project
+        EventTime,
+        UserName,
+        DestinationBucket,
+        ExternalAccountId,
+        SourceIPAddress,
+        AlertSeverity,
+        MitreTechnique,
+        MitreTactic,
+        DetectionName;
+PolicyChanges
+| union CrossAccountCopies
+| sort by EventTime desc
+
+
+// =============================================================================
+// RULE 4 — T1580: Cloud Infrastructure Discovery (API Enumeration / Recon)
+// Tactic: Discovery
+// Severity: High
+//
+// What this detects:
+//   A single source IP makes 15+ distinct List*/Describe*/Get* API calls
+//   across 3+ different AWS services within a 5-minute window.
+// =============================================================================
+
+CloudTrailLab_CL
+| where EventName matches regex @"^(List|Describe|Get)"
+| summarize
+    ApiCallCount = count(),
+    DistinctApiCalls = dcount(EventName),
+    DistinctServicesTouched = dcount(EventSource),
+    ApiCallsMade = make_set(EventName),
+    ServicesEnumerated = make_set(EventSource)
+    by SourceIPAddress, UserName, bin(EventTime, 5m)
+| where ApiCallCount >= 15 and DistinctServicesTouched >= 3
+| extend AlertSeverity = case(
+    DistinctServicesTouched >= 5, "Critical",
+    ApiCallCount >= 30, "High",
+    "Medium"
+  )
+| extend
+    MitreTechnique = "T1580 - Cloud Infrastructure Discovery",
+    MitreTactic = "Discovery",
+    DetectionName = "API Enumeration Burst - Multi-Service Recon Detected"
+| project
+    UserName,
+    SourceIPAddress,
+    EventTime,
+    ApiCallCount,
+    DistinctApiCalls,
+    DistinctServicesTouched,
+    ServicesEnumerated,
+    AlertSeverity,
+    MitreTechnique,
+    MitreTactic,
+    DetectionName
+| sort by ApiCallCount desc
+
+
+// =============================================================================
+// RULE 5 — T1136: Create Account (Rogue IAM User Creation)
+// Tactic: Persistence
+// Severity: Critical
+//
+// What this detects:
+//   CreateUser + AttachUserPolicy(AdministratorAccess) + CreateAccessKey
+//   for the same new IAM username within a 5-minute window.
+// =============================================================================
+
+CloudTrailLab_CL
+| where EventSource == "iam.amazonaws.com"
+| where EventName in ("CreateUser", "AttachUserPolicy", "CreateAccessKey")
+| extend IsAdminPolicy = iff(PolicyArn has "AdministratorAccess", 1, 0)
+| summarize
+    DistinctEventTypes = dcount(EventName),
+    EventsSeen = make_set(EventName),
+    AdminPolicyAttached = sum(IsAdminPolicy),
+    SourceIPs = make_set(SourceIPAddress),
+    Actor = make_set(UserName)
+    by TargetUserName, bin(EventTime, 5m)
+| where DistinctEventTypes >= 2 and AdminPolicyAttached >= 1
+| extend AlertSeverity = case(
+    DistinctEventTypes >= 3 and AdminPolicyAttached >= 1, "Critical",
+    AdminPolicyAttached >= 1, "High",
+    "Medium"
+  )
+| extend
+    MitreTechnique = "T1136 - Create Account",
+    MitreTactic = "Persistence",
+    DetectionName = "Rogue IAM User - Create + AdminAccess + AccessKey Cluster"
+| project
+    TargetUserName,
+    EventTime,
+    Actor,
+    DistinctEventTypes,
+    EventsSeen,
+    AdminPolicyAttached,
+    SourceIPs,
+    AlertSeverity,
+    MitreTechnique,
+    MitreTactic,
+    DetectionName
+| sort by AlertSeverity desc
+
+
+// =============================================================================
+// BONUS: UNIFIED THREAT TIMELINE
+// Chronological view of ALL TTP events. Use for incident timeline reconstruction
+// and for the "attack story" section of your README.
+// =============================================================================
+
+CloudTrailLab_CL
+| where isnotempty(MitreTechnique)
+| sort by EventTime asc
+| project
+    EventTime,
+    Actor = UserName,
+    SourceIP = SourceIPAddress,
+    Region = AwsRegion,
+    ApiCall = EventName,
+    AwsService = EventSource,
+    TTP = MitreTechnique,
+    Tactic = MitreTactic
